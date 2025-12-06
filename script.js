@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIG ---
-    // VERSION 14: Final fix for stuck day progression and full timer restore.
-    const SCRIPT_VERSION = 14; 
+    // VERSION 15: Final fix for timers, stuck day logic, and Admin UI.
+    const SCRIPT_VERSION = 15; 
     
     // ⚠️ IMPORTANT: To officially launch the calendar for the public on Dec 11th, 
     // CHANGE THIS TO 'true' AND RE-DEPLOY.
@@ -54,6 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const countdownBanner = document.getElementById('pre-release-countdown');
     const countdownTimer = document.getElementById('countdown-timer');
+    const countdownParagraph = countdownBanner ? countdownBanner.querySelector('p') : null;
+    
     const modalBackdrop = document.getElementById('modal-backdrop');
     const modalHeader = document.getElementById('modal-header');
     const modalContent = document.getElementById('modal-content');
@@ -73,26 +75,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const isManuallyLive = IS_LIVE || state.forceLive;
         const isPreRelease = !isManuallyLive;
 
-        // "Unstuck" Logic: Find the highest redeemed day and ensure cooldown allows the next day.
+        // "Unstuck" Logic (FIXED): Calculates if enough COOLDOWN\_MS cycles have passed since the RELEASE\_DATE
         if (isManuallyLive) {
-            let lastRedeemedDay = START_DAY - 1; 
-            for (let i = END_DAY; i >= START_DAY; i--) {
+            let totalRedeemed = 0;
+            for (let i = START_DAY; i <= END_DAY; i++) {
                 if (state[i].redeemed) {
-                    lastRedeemedDay = i;
-                    break;
+                    totalRedeemed++;
                 }
             }
 
+            const requiredTimeForNextDay = totalRedeemed * COOLDOWN_MS; 
             const timeSinceReleaseStart = now - RELEASE_DATE;
-            // Calculate how much total time must have passed for the day AFTER the last redeemed day to open.
-            const requiredTimeForNextDay = (lastRedeemedDay - START_DAY + 1) * COOLDOWN_MS; 
 
             if (timeSinceReleaseStart >= requiredTimeForNextDay) {
+                 // Forces the next day to be open if time has technically passed
                  state.nextUnlock = 0; 
             }
         }
 
-        // 1. HEADER CONTROL (RESTORES DECEMBER 11TH COUNTDOWN)
+        // 1. HEADER CONTROL (RESTORES DECEMBER 11TH COUNTDOWN AND REMOVES PLACEHOLDER)
+        if (countdownParagraph) countdownParagraph.textContent = ''; // Remove placeholder text
+
         if (isPreRelease) {
             countdownBanner.classList.remove('hidden');
             
@@ -112,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = START_DAY; i <= END_DAY; i++) {
                 const isGlobal = LOCKED_DAYS.includes(i) && state[`global${i}`]; 
                 
-                // If the day is NOT redeemed AND (it's not a special day OR it is globally unlocked)
+                // Finds the first day that is NOT redeemed AND is either standard or globally unlocked
                 if (!state[i].redeemed && (!LOCKED_DAYS.includes(i) || isGlobal)) {
                     unlockableDay = i;
                     break;
@@ -159,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             // Lock icon + Countdown in 23:59:59 format
                             innerHTML += `
                                 <div style="display:flex; justify-content:center; align-items:center; margin-top:15px; font-size: 1.2em;">
-                                    🔐&nbsp;<span id="cd-${i}">23:59:59</span>
+                                    🔐&nbsp;<span id="cd-${i}">--:--:--</span>
                                 </div>
                             `;
                             // START COOLDOWN TIMER (FIXED)
@@ -180,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- TIMING FUNCTIONS ---
+    // FIX: December 11th Countdown Timer
     const startCountdown = (target) => {
         clearInterval(mainInterval);
         const update = () => {
@@ -302,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // --- ADMIN SYSTEM (SECRET COMMANDS) --- (Unchanged)
+    // --- ADMIN SYSTEM (SECRET COMMANDS) --- (Admin UI Fixed)
     let inputBuffer = '';
     let hammerClicks = 0;
     
@@ -348,20 +352,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Toggle Live Mode (Test)
-    const debugControls = document.querySelector('.command-group h4')?.parentNode;
+    // Toggle Live Mode (Test) - FIX: No more UI changes here
+    const forceLiveBtn = document.createElement('button');
+    forceLiveBtn.innerText = "Toggle Live Mode (Test)";
+    forceLiveBtn.onclick = () => {
+        state.forceLive = !state.forceLive;
+        state.nextUnlock = 0; 
+        saveState();
+        render();
+        alert(`Live Mode is now: ${state.forceLive ? 'ON (TEST)' : 'OFF'}`);
+        const modal = document.getElementById('command-modal-backdrop');
+        if (modal) modal.classList.add('hidden');
+    };
+    const debugControls = document.querySelector('.command-modal .command-group:first-of-type');
     if (debugControls) {
-        const forceLiveBtn = document.createElement('button');
-        forceLiveBtn.innerText = "Toggle Live Mode (Test)";
-        forceLiveBtn.onclick = () => {
-            state.forceLive = !state.forceLive;
-            state.nextUnlock = 0; 
-            saveState();
-            render();
-            alert(`Live Mode is now: ${state.forceLive ? 'ON (TEST)' : 'OFF'}`);
-            const modal = document.getElementById('command-modal-backdrop');
-            if (modal) modal.classList.add('hidden');
-        };
         debugControls.appendChild(forceLiveBtn);
     }
     
