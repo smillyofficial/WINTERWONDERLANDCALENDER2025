@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎄 Dino-Bros Winter Advent Calendar 2025</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="snow-container">
+        <div class="snow"></div>
+        <div class="snow"></div>
+        <div class="snow"></div>
+        <div class="snow"></div>
+    </div>
+
+    <header>
+        <h1>Dino-Bros Winter Wonderland 2025</h1>
+        <h2>A Community Advent Calendar</h2>
+    </header>
+
+    <div id="pre-release-countdown" class="hidden">
+        <p class="countdown-title">OPENING IN:</p>
+        <div id="countdown-timer">
+            </div>
+    </div>
+
+    <div id="calendar-container">
+        </div>
+    
+    <div id="modal-backdrop" class="hidden">
+        <div id="reward-modal">
+            <h3 id="modal-header"></h3>
+            <div id="modal-content"></div>
+            <button id="modal-ok-btn">OK</button>
+        </div>
+    </div>
+
+    <div id="command-modal-backdrop" class="hidden">
+        <div id="command-modal">
+            <h3>🔨 Admin Panel 🔨</h3>
+            <p class="warning">Command: nullandnoobius</p>
+            
+            <div class="command-group">
+                <h4>Debug Controls</h4>
+                <button id="reset-timer-btn">Reset My Cooldown</button>
+                <button id="skip-date-btn">Skip to Dec 11 (Simulate)</button>
+            </div>
+
+            <div class="command-group global-controls">
+                <h4>Global Unlocks (23-25)</h4>
+                <button id="unlock-23-btn">Open 23rd</button>
+                <button id="unlock-24-btn">Open 24th</button>
+                <button id="unlock-25-btn">Open 25th</button>
+            </div>
+
+            <button id="command-close-btn">Close Panel</button>
+        </div>
+    </div>
+
+    <div id="command-hammer" class="hidden">🔨</div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

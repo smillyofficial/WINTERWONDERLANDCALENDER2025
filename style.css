@@ -1,0 +1,188 @@
+:root {
+    --color-snow: #ecf0f1;
+    --color-ice-blue: #3498db;
+    --color-dark-blue: #2c3e50;
+    --color-ginger: #8e44ad; /* Changed to a magical winter purple/blue vibe */
+    --color-wood: #5d4037;
+    --color-red: #c0392b;
+    --color-gold: #f1c40f;
+    --font-cartoon: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+}
+
+body {
+    background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+    font-family: var(--font-cartoon);
+    color: var(--color-snow);
+    text-align: center;
+    min-height: 100vh;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+/* --- SNOWFALL ANIMATION --- */
+.snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.snow {
+    position: absolute; width: 10px; height: 10px; background: white; border-radius: 50%;
+    animation: fall 10s linear infinite; opacity: 0.5;
+}
+.snow:nth-child(1) { left: 10%; animation-duration: 15s; width: 15px; height: 15px; }
+.snow:nth-child(2) { left: 30%; animation-duration: 10s; width: 8px; height: 8px; }
+.snow:nth-child(3) { left: 70%; animation-duration: 20s; }
+.snow:nth-child(4) { left: 90%; animation-duration: 12s; width: 12px; height: 12px; }
+
+@keyframes fall {
+    0% { transform: translateY(-100vh); }
+    100% { transform: translateY(100vh); }
+}
+
+header {
+    position: relative; z-index: 10;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 20px; border-radius: 15px; border: 2px solid var(--color-ice-blue);
+    display: inline-block; margin-bottom: 20px;
+}
+
+h1 { color: var(--color-gold); margin: 0; text-shadow: 0 0 10px var(--color-red); font-size: 2.5em; }
+h2 { margin: 5px 0 0; color: var(--color-ice-blue); font-size: 1.2em; }
+
+/* --- COUNTDOWN BANNER --- */
+#pre-release-countdown {
+    position: relative; z-index: 10;
+    background: linear-gradient(90deg, var(--color-dark-blue), var(--color-red));
+    padding: 15px;
+    border-radius: 10px;
+    max-width: 600px;
+    margin: 0 auto 30px auto;
+    border: 4px solid var(--color-gold);
+    box-shadow: 0 0 20px var(--color-gold);
+}
+
+#countdown-timer {
+    display: flex; justify-content: center; gap: 20px;
+    font-size: 1.5em; font-weight: bold; color: var(--color-snow);
+}
+.time-unit { display: flex; flex-direction: column; align-items: center; }
+.time-unit span { font-size: 0.5em; color: var(--color-gold); }
+
+/* --- CALENDAR GRID --- */
+#calendar-container {
+    position: relative; z-index: 5;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px;
+    background: rgba(93, 64, 55, 0.9); /* Wood texture */
+    border-radius: 20px;
+    border: 10px solid var(--color-wood);
+    box-shadow: inset 0 0 50px #000, 0 20px 40px rgba(0,0,0,0.8);
+}
+
+.day-box {
+    position: relative;
+    height: 150px;
+    background: var(--color-snow);
+    border: 4px solid var(--color-dark-blue);
+    border-radius: 15px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+}
+
+/* Day Number Styling - Always visible */
+.day-number {
+    position: absolute;
+    top: 10px; left: 10px;
+    font-size: 1.8em; font-weight: 900;
+    color: var(--color-dark-blue);
+    z-index: 5;
+}
+
+/* Hover Effects */
+.day-box:hover:not(.locked):not(.redeemed) {
+    transform: scale(1.1);
+    box-shadow: 0 0 25px var(--color-ice-blue);
+    z-index: 10;
+}
+
+/* PRE-RELEASE STATE */
+.pre-release-door {
+    background: #34495e;
+}
+.pre-release-door .day-number { color: var(--color-ice-blue); } /* Contrast fix */
+.pre-release-door .lock-icon {
+    font-size: 3em; margin-top: 10px;
+}
+.pre-release-door .lock-text {
+    font-size: 0.8em; color: var(--color-gold); font-weight: bold; letter-spacing: 1px;
+}
+
+/* LOCKED / COOLDOWN STATE */
+.locked {
+    background: #2c3e50;
+    cursor: not-allowed;
+}
+.locked .day-number { color: #7f8c8d; }
+.cooldown-timer {
+    margin-top: 20px; font-size: 1em; color: var(--color-gold);
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #000;
+}
+
+/* REDEEMED STATE */
+.redeemed {
+    background: #bdc3c7; cursor: default;
+}
+.redeemed .day-number { opacity: 0.3; }
+.redeemed::after {
+    content: '⭐'; font-size: 5em;
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    text-shadow: 0 0 20px var(--color-gold);
+    animation: starPulse 2s infinite;
+}
+
+@keyframes starPulse { 0% { opacity: 0.8; transform: translate(-50%, -50%) scale(0.9); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } }
+
+/* SPECIAL LOCKED (23-25) */
+.special-locked {
+    background: linear-gradient(135deg, #000, #434343);
+    border: 3px solid transparent;
+    border-image: linear-gradient(45deg, red, gold, green, blue) 1;
+    animation: borderRun 1s infinite linear;
+}
+.special-locked .day-number { color: var(--color-gold); text-shadow: 0 0 10px gold; }
+.special-eyes { font-size: 4em; opacity: 0.5; animation: blink 3s infinite; }
+
+@keyframes blink { 0%, 90%, 100% { opacity: 0.5; } 95% { opacity: 0.1; } }
+
+/* MODALS */
+.hidden { display: none !important; }
+#modal-backdrop {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); z-index: 100;
+    display: flex; justify-content: center; align-items: center;
+}
+#reward-modal, #command-modal {
+    background: white; color: #2c3e50; padding: 30px; border-radius: 15px;
+    max-width: 400px; width: 90%; text-align: center;
+    border: 5px solid var(--color-red);
+}
+.code-box {
+    background: #ecf0f1; padding: 15px; border: 2px dashed #34495e;
+    font-family: monospace; font-size: 1.5em; margin: 15px 0; letter-spacing: 2px;
+}
+button {
+    background: var(--color-gold); border: none; padding: 10px 20px;
+    font-size: 1.2em; font-weight: bold; cursor: pointer; border-radius: 5px;
+    margin-top: 10px;
+}
+button:hover { background: #f39c12; }
+
+/* Admin Hammer */
+#command-hammer {
+    position: fixed; bottom: 20px; left: 20px; font-size: 3em; cursor: pointer; z-index: 200;
+    opacity: 0.2; transition: opacity 0.3s;
+}
+#command-hammer:hover { opacity: 1; }
