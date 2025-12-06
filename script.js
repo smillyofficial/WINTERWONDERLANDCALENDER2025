@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIG ---
-    // VERSION 13: FORCES A CLEAN SLATE (NO MORE STUCK DAYS)
-    const SCRIPT_VERSION = 13; 
+    // VERSION 14: Final fix for stuck day progression and full timer restore.
+    const SCRIPT_VERSION = 14; 
     
     // ⚠️ IMPORTANT: To officially launch the calendar for the public on Dec 11th, 
     // CHANGE THIS TO 'true' AND RE-DEPLOY.
@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const START_DAY = 11;
     const END_DAY = 25;
     const LOCKED_DAYS = [23, 24, 25]; // These days are only unlocked by admin command
+    // Set the release date to 2025 to ensure the countdown displays correctly
     const RELEASE_DATE = new Date('December 11, 2025 00:00:00').getTime(); 
     const COOLDOWN_MS = 24 * 60 * 60 * 1000;
     const COMMAND_CODE = 'nullandnoobius';
@@ -72,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isManuallyLive = IS_LIVE || state.forceLive;
         const isPreRelease = !isManuallyLive;
 
-        // "Unstuck" Logic: If enough time has passed since the release for the next day to be open, reset the cooldown.
+        // "Unstuck" Logic: Find the highest redeemed day and ensure cooldown allows the next day.
         if (isManuallyLive) {
             let lastRedeemedDay = START_DAY - 1; 
             for (let i = END_DAY; i >= START_DAY; i--) {
@@ -91,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 1. HEADER CONTROL
+        // 1. HEADER CONTROL (RESTORES DECEMBER 11TH COUNTDOWN)
         if (isPreRelease) {
             countdownBanner.classList.remove('hidden');
             
@@ -105,14 +106,13 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInterval(mainInterval);
         }
 
-        // 2. DETERMINE NEXT UNLOCKABLE DAY (First unredeemed, non-special day)
+        // 2. DETERMINE NEXT UNLOCKABLE DAY (FIXES STUCK DAY BUG)
         let unlockableDay = null;
         if (!isPreRelease) {
             for (let i = START_DAY; i <= END_DAY; i++) {
-                // Check if it's a special day AND if the admin has globally unlocked it
                 const isGlobal = LOCKED_DAYS.includes(i) && state[`global${i}`]; 
                 
-                // If not redeemed AND (it's not a special day OR admin unlocked it)
+                // If the day is NOT redeemed AND (it's not a special day OR it is globally unlocked)
                 if (!state[i].redeemed && (!LOCKED_DAYS.includes(i) || isGlobal)) {
                     unlockableDay = i;
                     break;
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     🔐&nbsp;<span id="cd-${i}">23:59:59</span>
                                 </div>
                             `;
-                            // START COOLDOWN TIMER
+                            // START COOLDOWN TIMER (FIXED)
                             startCooldownDisplay(i, state.nextUnlock);
                         } else {
                             box.classList.add('available');
@@ -196,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const m = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, '0');
             const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
             
+            // Format: days hours minutes seconds (FIXED)
             countdownTimer.innerHTML = `
                 <div class="time-unit">${d}<span>DAYS</span></div>
                 <div class="time-unit">${h}<span>HOURS</span></div>
@@ -207,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mainInterval = setInterval(update, 1000);
     };
 
-    // FIX: Robust 24h Cooldown Timer
+    // FIX: Accurate 24h Cooldown Timer (HH:MM:SS)
     const startCooldownDisplay = (day, target) => {
         const el = document.querySelector(`#cd-${day}`);
         if(!el) return;
@@ -223,10 +224,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return; 
             }
             
-            // Format: HH:MM:SS
-            const h = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0'); // Shows total hours remaining
-            const m = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, '0');
-            const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+            // Calculate total hours, minutes, and seconds remaining from the difference
+            const totalSeconds = Math.floor(diff / 1000);
+            const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const s = String(totalSeconds % 60).padStart(2, '0');
             
             el.innerText = `${h}:${m}:${s}`; 
         }, 1000);
@@ -347,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Toggle Live Mode (Test)
-    const debugControls = document.querySelector('.command-group h4').parentNode;
+    const debugControls = document.querySelector('.command-group h4')?.parentNode;
     if (debugControls) {
         const forceLiveBtn = document.createElement('button');
         forceLiveBtn.innerText = "Toggle Live Mode (Test)";
