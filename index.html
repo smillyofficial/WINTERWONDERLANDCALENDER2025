@@ -3,63 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎄 Dino-Bros Winter Advent Calendar 2025</title>
-    <link rel="stylesheet" href="style.css">
+    <title>DINO BRO WINTER ADVENT CALENDAR</title>
+    <link rel="stylesheet" href="style.css"> 
+    
+    <style>
+        .countdown-banner, #pre-release-countdown { 
+            display: block !important;
+            visibility: visible !important;
+            color: white !important; /* Ensures numbers are visible */
+            text-align: center !important;
+        }
+        .countdown-timer .time-unit span {
+            display: block !important;
+        }
+    </style>
 </head>
 <body>
-    <div class="snow-container">
-        <div class="snow"></div>
-        <div class="snow"></div>
-        <div class="snow"></div>
-        <div class="snow"></div>
-    </div>
-
-    <header>
-        <h1>Dino-Bros Winter Wonderland 2025</h1>
-        <h2>A Community Advent Calendar</h2>
-    </header>
-
-    <div id="pre-release-countdown" class="hidden">
-        <p class="countdown-title">OPENING IN:</p>
-        <div id="countdown-timer">
+    <div class="calendar-wrapper">
+        <header>
+            <h1>DINO BRO WINTER ADVENT CALENDAR</h1>
+            <div id="pre-release-countdown" class="countdown-banner">
+                <p>[COUNTDOWN WILL BE HERE]</p>
+                <div id="countdown-timer" class="countdown-timer"></div>
             </div>
+            <div class="header-line"></div>
+        </header>
+        
+        <main id="calendar-container" class="calendar-container">
+            </main>
     </div>
 
-    <div id="calendar-container">
-        </div>
-    
-    <div id="modal-backdrop" class="hidden">
-        <div id="reward-modal">
-            <h3 id="modal-header"></h3>
-            <div id="modal-content"></div>
+    <div id="modal-backdrop" class="modal-backdrop hidden">
+        <div class="modal">
+            <h2 id="modal-header">Title</h2>
+            <div id="modal-content">Content</div>
             <button id="modal-ok-btn">OK</button>
         </div>
     </div>
-
-    <div id="command-modal-backdrop" class="hidden">
-        <div id="command-modal">
-            <h3>🔨 Admin Panel 🔨</h3>
-            <p class="warning">Command: nullandnoobius</p>
-            
+    <div id="command-modal-backdrop" class="modal-backdrop hidden">
+        <div class="modal command-modal">
+            <h2>Admin Commands</h2>
             <div class="command-group">
-                <h4>Debug Controls</h4>
-                <button id="reset-timer-btn">Reset My Cooldown</button>
-                <button id="skip-date-btn">Skip to Dec 11 (Simulate)</button>
+                <h4>State Management</h4>
+                <button id="reset-timer-btn">Reset Cooldown (Unstuck)</button>
             </div>
-
-            <div class="command-group global-controls">
-                <h4>Global Unlocks (23-25)</h4>
-                <button id="unlock-23-btn">Open 23rd</button>
-                <button id="unlock-24-btn">Open 24th</button>
-                <button id="unlock-25-btn">Open 25th</button>
+            <div class="command-group">
+                <h4>Global Unlocks</h4>
+                <button id="unlock-23-btn">Unlock Day 23</button>
+                <button id="unlock-24-btn">Unlock Day 24</button>
+                <button id="unlock-25-btn">Unlock Day 25</button>
             </div>
-
-            <button id="command-close-btn">Close Panel</button>
+            <button id="command-close-btn">Close</button>
         </div>
     </div>
+    <div id="command-hammer" class="command-hammer hidden">🔨</div>
 
-    <div id="command-hammer" class="hidden">🔨</div>
-    
     <script src="script.js"></script>
 </body>
 </html>
